@@ -1,3 +1,6 @@
-# explorer-game-engine
+# Explorer Engine
 An OpenGL Game Engine Written In Java
-Based on CodingAP porject.
+Core Based on Tutorials from CodingPA and ThinMatrix
+
+![Logo](https://i.imgur.com/TuHJfFN.png)
+Format: ![Alt Text](url)
