@@ -1,5 +1,7 @@
 package main;
 
+import imgui.ImGui;
+import imgui.ImGuiIO;
 import main.display.Window;
 import main.graphics.*;
 import main.input.Input;
@@ -7,35 +9,30 @@ import main.math.Vector2f;
 import main.math.Vector3f;
 import main.objects.Camera;
 import main.objects.GameObject;
+import main.scene.EditorScene;
+import main.scene.Scene;
+import main.utils.Cube;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Vector;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
+
 public class Application implements Runnable {
 
+
+    private Scene currentScene;
     private Thread mainGameThread;
     private Window window;
-
-
+    public static double deltaTime;
     public Renderer renderer;
     public Shader shader;
-    public Mesh mesh = new Mesh(new Vertex[]{
-            new Vertex(new Vector3f(-0.5f, 0.5f, 0.0f), new Vector3f(1.0f, 0.0f, 0.0f), new Vector2f(0.0f, 0.0f)),
-            new Vertex(new Vector3f(-0.5f, -0.5f, 0.0f), new Vector3f(0.0f, 1.0f, 0.0f), new Vector2f(0.0f, 1.0f)),
-            new Vertex(new Vector3f(0.5f, -0.5f, 0.0f), new Vector3f(0.0f, 0.0f, 1.0f), new Vector2f(1.0f, 1.0f)),
-            new Vertex(new Vector3f(0.5f, 0.5f, 0.0f), new Vector3f(1.0f, 1.0f, 0.0f), new Vector2f(1.0f, 0.0f)),
-    },
-            new int[]{
-                    0, 1, 2,
-                    0, 3, 2
-
-    }, new Material("/textures/test-texture.jpg"));
 
 
 
-    public GameObject object = new GameObject(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), mesh);
 
-    public Camera camera = new Camera(new Vector3f(0, 0,1), new Vector3f(0, 0, 0));
+
 
     //Launch mainGameThread
     public void launch()
@@ -48,7 +45,7 @@ public class Application implements Runnable {
     public void stop()
     {
         window.close();
-        mesh.destroy();
+        Cube.mesh.destroy();
         shader.destroy();
         mainGameThread.interrupt();
 
@@ -58,24 +55,51 @@ public class Application implements Runnable {
     public void run() {
 
         init();
+        double time = 0; // to track our frame delta value
+
+
         while (!window.shouldClose() && !mainGameThread.isInterrupted())
         {
+            final double currentTime = glfwGetTime();
+            deltaTime = (time > 0) ? (currentTime - time) : 1f / 60f;
+            time = currentTime;
             update();
             render();
         }
         this.stop();
     }
 
+
+    public void createEditorScene()
+    {
+        //TEMP
+        GameObject object = new GameObject(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), Cube.mesh);
+        Camera camera = new Camera(new Vector3f(0, 0,1), new Vector3f(0, 0, 0));
+
+        System.out.println("Initializing Explorer Game Engine -- Loading EditorScene");
+        Scene scene = new EditorScene();
+        scene.setSceneCamera(camera);
+        scene.addSceneObject(object);
+
+        currentScene = scene;
+    }
+
     public void init()
     {
-        System.out.println("Initializing Explorer Game Engine");
-        window = new Window(1280, 720, "Explorer Engine");
+        createEditorScene();
+
+
+
+
+        window = new Window(1280, 720, "Explorer Engine", currentScene);
         shader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
         renderer = new Renderer(window, shader);
-        window.setBackgroundColor(0.9f, 0.25f, 0f);
+        window.setBackgroundColor(1f, 1f, 1f);
         window.create();
-        mesh.create();
+        Cube.mesh.create();
         shader.create();
+
+
     }
 
 
@@ -83,19 +107,27 @@ public class Application implements Runnable {
     public void update()
     {
         window.update();
-        camera.update();
+        currentScene.update();
+        final ImGuiIO io = ImGui.getIO();
 
-
-        //TEST
-        if (Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
+        if (io.getKeysDown(GLFW_KEY_ESCAPE))
         {
             stop();
         }
-        //TEST2
-        if(Input.isButtonDown(GLFW.GLFW_MOUSE_BUTTON_1))
+
+
+
+        //Mouse States
+        if(io.getMouseDown(GLFW.GLFW_MOUSE_BUTTON_1))
         {
-            System.out.println("X: " + Input.getCursorX()+ " Y: " + Input.getCursorY());
-            System.out.println("Scroll X: " + Input.getScrollX()+ " Scroll Y: " + Input.getScrollY());
+
+            window.mouseState(false);
+        }
+
+        if (io.getMouseDown(GLFW.GLFW_MOUSE_BUTTON_2))
+        {
+
+            window.mouseState(true);
         }
 
 
@@ -107,7 +139,7 @@ public class Application implements Runnable {
 
     public void render()
     {
-        renderer.renderMesh(object, camera);
+        renderer.render(currentScene);
         window.swapBuffer();
 
     }

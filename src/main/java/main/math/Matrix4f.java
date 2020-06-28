@@ -95,10 +95,10 @@ public class Matrix4f {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 result.set(i, j,    matrix.get(i, 0) * other.get(0, j) +
-                                          matrix.get(i, 1) * other.get(1, j) +
-                                          matrix.get(i, 2) * other.get(2, j) +
-                                          matrix.get(i, 3) * other.get(3, j)
-                        );
+                        matrix.get(i, 1) * other.get(1, j) +
+                        matrix.get(i, 2) * other.get(2, j) +
+                        matrix.get(i, 3) * other.get(3, j)
+                );
             }
         }
 

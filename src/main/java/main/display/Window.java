@@ -1,15 +1,18 @@
 package main.display;
 
+import main.Application;
 import main.input.Input;
 import main.math.Matrix4f;
 import main.math.Vector3f;
+import main.scene.Scene;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
-import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
 
 
 public class Window {
@@ -17,40 +20,31 @@ public class Window {
     private int width;
     private int height;
     private String title;
-
-    private long window;
-
+    public static long windowPtr;
     private Input input;
     private Vector3f background = new Vector3f(0,0,0);
 
-    //fps
-    private int frameCount;
-    private long time;
 
     private Matrix4f projection;
+    private GuiLayer guiLayer;
+    private Scene currentScene;
 
+
+    public static void mouseState(boolean lock) {
+        GLFW.glfwSetInputMode(windowPtr, GLFW_CURSOR, lock ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    }
 
     private boolean isResized;
-    private boolean isFullscreen;
     private GLFWWindowSizeCallback sizeCallback;
 
-    public Window(int width, int height, String title) {
+    public Window(int width, int height, String title, Scene scene) {
         this.width = width;
         this.height = height;
         this.title = title;
+        this.currentScene = scene;
         projection = Matrix4f.projection(70.0f, (float) width / (float) height, 0.1f, 1000.0f);
     }
 
-    private void fpsCounter()
-    {
-        frameCount++;
-        if (System.currentTimeMillis() > time + 1000)
-        {
-            GLFW.glfwSetWindowTitle(window, title + " - FPS: " + frameCount);
-            time = System.currentTimeMillis();
-            frameCount = 0;
-        }
-    }
 
     public void create()
     {
@@ -59,18 +53,14 @@ public class Window {
             System.err.println("ERROR: Failed to initialize GLFW");
             return;
         }
-
         input = new Input();
         long primary = GLFW.glfwGetPrimaryMonitor();
-
-        window = GLFW.glfwCreateWindow(width, height, title, isFullscreen ? primary : 0, 0);
-
-        if (window == 0)
+        windowPtr = GLFW.glfwCreateWindow(width, height, title, 0, 0);
+        if (windowPtr == 0)
         {
             System.err.println("ERROR: Failed to initialize Window");
             return;
         }
-
         GLFWVidMode videoMode = GLFW.glfwGetVideoMode(primary);
         if (videoMode == null)
         {
@@ -78,27 +68,36 @@ public class Window {
             return;
         }
 
-        GLFW.glfwMakeContextCurrent(window);
-
+        GLFW.glfwMakeContextCurrent(windowPtr);
         GL.createCapabilities();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+
         registerCallBacks();
+        this.guiLayer = new GuiLayer(this);
+        this.guiLayer.init();
+
+
+
 
 
 
         var posX = (videoMode.width() - width) / 2;
         var posY = (videoMode.height() - height) / 2;
-        GLFW.glfwSetWindowPos(window, posX, posY);
-        GLFW.glfwShowWindow(window);
+        GLFW.glfwSetWindowPos(windowPtr, posX, posY);
+        GLFW.glfwShowWindow(windowPtr);
         GLFW.glfwSwapInterval(1);
 
-        time = System.currentTimeMillis();
+
+
     }
 
 
     private void registerCallBacks()
     {
-
+        GLFW.glfwSetKeyCallback(windowPtr, input.getKeyboard());
+        GLFW.glfwSetMouseButtonCallback(windowPtr, input.getMouseButtons());
+        GLFW.glfwSetCursorPosCallback(windowPtr, input.getCursorMove());
         sizeCallback = new GLFWWindowSizeCallback() {
             @Override
             public void invoke(long window, int w, int h) {
@@ -108,11 +107,8 @@ public class Window {
             }
         };
 
-        GLFW.glfwSetKeyCallback(window, input.getKeyboard());
-        GLFW.glfwSetMouseButtonCallback(window, input.getMouseButtons());
-        GLFW.glfwSetCursorPosCallback(window, input.getCursorMove());
-        GLFW.glfwSetWindowSizeCallback(window, sizeCallback);
-        GLFW.glfwSetScrollCallback(window, input.getMouseScroll());
+        GLFW.glfwSetWindowSizeCallback(windowPtr, sizeCallback);
+        GLFW.glfwSetScrollCallback(windowPtr, input.getMouseScroll());
     }
 
 
@@ -134,89 +130,48 @@ public class Window {
 
 
     public void update() {
+
         updateViewPort();
         GL11.glClearColor(background.getX(), background.getY(), background.getZ(), 1f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GLFW.glfwPollEvents();
-        fpsCounter();
     }
 
     public void swapBuffer()
     {
-        GLFW.glfwSwapBuffers(window);
+        this.guiLayer.update((float) Application.deltaTime, currentScene);
+        GLFW.glfwSwapBuffers(windowPtr);
     }
 
     public void close()
     {
         this.shouldClose();
-        GLFW.glfwDestroyWindow(window);
+        GLFW.glfwDestroyWindow(windowPtr);
         GLFW.glfwTerminate();
     }
 
 
     public boolean shouldClose()
     {
-        return GLFW.glfwWindowShouldClose(window);
+        return GLFW.glfwWindowShouldClose(windowPtr);
     }
 
 
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public long getWindow() {
-        return window;
-    }
-
-    public void setWindow(long window) {
-        this.window = window;
-    }
-
-    public int getFrameCount() {
-        return frameCount;
-    }
-
-    public void setFrameCount(int frameCount) {
-        this.frameCount = frameCount;
-    }
-
-    public boolean isResized() {
-        return isResized;
-    }
 
     public Matrix4f getProjection() {
         return projection;
     }
 
-    public void setResized(boolean resized) {
-        isResized = resized;
 
+    public long getWindow() {
+        return windowPtr;
     }
 
-    public boolean isFullscreen() {
-        isResized = true;
-        return isFullscreen;
+    public int getWidth() {
+        return width;
     }
 
-
+    public int getHeight() {
+        return height;
+    }
 }

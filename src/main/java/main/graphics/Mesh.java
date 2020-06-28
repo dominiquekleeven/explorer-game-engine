@@ -9,6 +9,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Objects;
 
 public class Mesh {
 
@@ -16,14 +17,9 @@ public class Mesh {
     private int[] indices;
     private Material material;
 
-    //Vertex Array Obj
+
     private int vao;
-
-    //Position Buffer Object
-    private int pbo;
-
-    private int cbo;
-
+    private int vbo;
     private int tbo;
 
 
@@ -57,22 +53,10 @@ public class Mesh {
         }
 
         positionBuffer.put(positionData).flip();
-        pbo = storeData(positionBuffer, 0, 3);
+        vbo = storeData(positionBuffer, 0, 3);
 
 
 
-        //Color
-        FloatBuffer colorBuffer = MemoryUtil.memAllocFloat(vertices.length * 3);
-        float[] colorData = new float[vertices.length * 3];
-        for (int i = 0; i < vertices.length; i++)
-        {
-            colorData[i * 3] = vertices[i].getColor().getX();
-            colorData[i * 3 + 1] = vertices[i].getColor().getY();
-            colorData[i * 3 + 2] = vertices[i].getColor().getZ();
-        }
-
-        colorBuffer.put(colorData).flip();
-        cbo = storeData(colorBuffer, 1, 3);
 
         //Texture
         FloatBuffer textureBuffer = MemoryUtil.memAllocFloat(vertices.length * 2);
@@ -87,10 +71,6 @@ public class Mesh {
         tbo = storeData(textureBuffer, 2, 2);
 
 
-
-
-
-
         IntBuffer indicesBuffer = MemoryUtil.memAllocInt(indices.length);
         indicesBuffer.put(indices).flip();
         ibo = GL15.glGenBuffers();
@@ -98,10 +78,9 @@ public class Mesh {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 
-
-
-
     }
+
+
 
 
     private int storeData(FloatBuffer buffer, int index, int size)
@@ -111,19 +90,31 @@ public class Mesh {
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
         GL20.glVertexAttribPointer(index, size, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
         return bufferId;
     }
 
 
     public void destroy()
     {
-        GL15.glDeleteBuffers(pbo);
-        GL15.glDeleteBuffers(cbo);
+        GL15.glDeleteBuffers(vbo);
         GL15.glDeleteBuffers(ibo);
         GL15.glDeleteBuffers(tbo);
         GL30.glDeleteVertexArrays(vao);
         material.destroy();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mesh mesh = (Mesh) o;
+        return Objects.equals(material, mesh.material);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(material);
     }
 
     public Material getMaterial() {
@@ -142,14 +133,6 @@ public class Mesh {
         return vao;
     }
 
-    public int getPBO() {
-        return pbo;
-    }
-
-    public int getCBO() {
-        return cbo;
-    }
-
     public int getIBO() {
         return ibo;
     }
@@ -157,4 +140,6 @@ public class Mesh {
     public int getTBO() {
         return tbo;
     }
+
+
 }
