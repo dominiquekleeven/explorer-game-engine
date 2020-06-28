@@ -24,9 +24,7 @@ public class Material {
 
     }
 
-    public  void loadTexture() {
-
-
+    public void loadTexture() {
         PNGDecoder decoder = null;
         try {
             decoder = new PNGDecoder(Material.class.getResourceAsStream(path));
@@ -34,9 +32,7 @@ public class Material {
             e.printStackTrace();
         }
 
-
         ByteBuffer buffer = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-
 
         try {
             decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
@@ -45,16 +41,11 @@ public class Material {
         }
 
         buffer.flip();
-
         int id = glGenTextures();
-
         glBindTexture(GL_TEXTURE_2D, id);
-
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
         GL30.glGenerateMipmap(GL_TEXTURE_2D);
