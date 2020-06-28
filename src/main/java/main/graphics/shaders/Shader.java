@@ -1,4 +1,4 @@
-package main.graphics;
+package main.graphics.shaders;
 
 import main.math.Matrix4f;
 import main.math.Vector2f;

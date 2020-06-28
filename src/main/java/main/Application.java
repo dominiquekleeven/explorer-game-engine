@@ -4,17 +4,15 @@ import imgui.ImGui;
 import imgui.ImGuiIO;
 import main.display.Window;
 import main.graphics.*;
-import main.input.Input;
-import main.math.Vector2f;
+import main.graphics.shaders.Shader;
 import main.math.Vector3f;
 import main.objects.Camera;
 import main.objects.GameObject;
 import main.scene.EditorScene;
 import main.scene.Scene;
 import main.utils.Cube;
+import main.utils.FileUtil;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Vector;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
@@ -70,25 +68,28 @@ public class Application implements Runnable {
     }
 
 
-    public void createEditorScene()
-    {
-        //TEMP
-        GameObject object = new GameObject(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), Cube.mesh);
-        Camera camera = new Camera(new Vector3f(0, 0,1), new Vector3f(0, 0, 0));
 
+
+    public void init()
+    {
+
+
+        GameObject object = new GameObject(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), Cube.mesh);
+        GameObject cubeObj = new GameObject(new Vector3f(1, 1, 1), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1),
+                FileUtil.loadModel("src/main/resources/models/cube.obj", "/textures/stairs.png"));
+
+        GameObject stair = new GameObject(new Vector3f(5, 5, 5), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1),
+                FileUtil.loadModel("src/main/resources/models/stair.obj", "/textures/stairs.png"));
+
+        Camera camera = new Camera(new Vector3f(0, 0,1), new Vector3f(0, 0, 0));
         System.out.println("Initializing Explorer Game Engine -- Loading EditorScene");
         Scene scene = new EditorScene();
         scene.setSceneCamera(camera);
         scene.addSceneObject(object);
+        scene.addSceneObject(cubeObj);
+        scene.addSceneObject(stair);
 
         currentScene = scene;
-    }
-
-    public void init()
-    {
-        createEditorScene();
-
-
 
 
         window = new Window(1280, 720, "Explorer Engine", currentScene);
@@ -96,6 +97,8 @@ public class Application implements Runnable {
         renderer = new Renderer(window, shader);
         window.setBackgroundColor(1f, 1f, 1f);
         window.create();
+        cubeObj.getMesh().create();
+        stair.getMesh().create();
         Cube.mesh.create();
         shader.create();
 

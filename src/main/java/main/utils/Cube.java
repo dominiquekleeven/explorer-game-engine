@@ -8,7 +8,7 @@ import main.math.Vector3f;
 
 public class Cube {
 
-    public static Material material =  new Material("/textures/test-texture.jpg");
+    public static Material material =  new Material("/textures/stairs.png");
 
     public static Mesh mesh = new Mesh(new Vertex[] {
             //Back face

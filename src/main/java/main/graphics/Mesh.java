@@ -37,7 +37,13 @@ public class Mesh {
 
     public void create() {
 
-        material.create();
+
+
+
+        material.loadTexture();
+
+
+
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
 

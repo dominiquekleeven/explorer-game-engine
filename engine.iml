@@ -20,6 +20,7 @@
     <orderEntry type="library" name="Maven: org.lwjgl:lwjgl-bgfx:3.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.lwjgl:lwjgl-glfw:3.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.lwjgl:lwjgl-nanovg:3.2.3" level="project" />
+    <orderEntry type="library" name="Maven: org.l33tlabs.twl:pngdecoder:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.lwjgl:lwjgl-nuklear:3.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.lwjgl:lwjgl-openal:3.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.lwjgl:lwjgl-opengl:3.2.3" level="project" />

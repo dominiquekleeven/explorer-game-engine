@@ -1,16 +1,14 @@
 package main.graphics;
 
 import main.display.Window;
+import main.graphics.shaders.Shader;
 import main.math.Matrix4f;
-import main.objects.Camera;
 import main.objects.GameObject;
 import main.scene.Scene;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
-
-import java.util.ArrayList;
 
 public class Renderer {
 
