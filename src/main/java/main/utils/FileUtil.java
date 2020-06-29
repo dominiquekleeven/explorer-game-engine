@@ -8,8 +8,6 @@ import main.math.Vector2f;
 import main.math.Vector3f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
-import org.lwjglx.util.vector.Vector4f;
-import org.newdawn.slick.opengl.Texture;
 
 import java.io.BufferedReader;
 import java.io.IOException;

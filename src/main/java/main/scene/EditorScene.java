@@ -4,8 +4,7 @@ import imgui.ImGui;
 import main.math.Vector3f;
 import main.objects.GameObject;
 import main.utils.Cube;
-import org.lwjgl.glfw.GLFW;
-import org.lwjglx.test.spaceinvaders.Game;
+
 
 public class EditorScene extends  Scene{
 

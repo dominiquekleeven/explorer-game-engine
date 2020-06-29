@@ -1,0 +1,18 @@
+
+^
+java:S1854a"CRemove this useless assignment to local variable "materialsBuffer".(›§Χωÿÿÿÿ
+Z
+java:S20958"DUse try-with-resources or close this "AIMesh" in a "finally" clause.(ρέ·
+O
+java:S1481a"4Remove this unused "materialsBuffer" local variable.(›§Χωÿÿÿÿ
+F
+java:S1128"+Remove this unused import 'java.util.List'.(Υλ±Δψÿÿÿÿ
+X
+java:S1854b"=Remove this useless assignment to local variable "materials".(όδ¨δωÿÿÿÿ
+E
+java:S1128"/Remove this unused import 'java.nio.IntBuffer'.(Β†›’
+C	java:S108c")Either remove or fill this block of code.(ª„σϋÿÿÿÿ
+Y
+java:S22598"CA "NullPointerException" could be thrown; "scene" is nullable here.(ρέ·
+I
+java:S1481b".Remove this unused "materials" local variable.(όδ¨δωÿÿÿÿ
